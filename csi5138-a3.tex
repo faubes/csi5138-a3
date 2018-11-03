@@ -137,6 +137,7 @@ The code for loading the GloVE pretrained word embeddings and creating the embed
 
 The code for using an embedding layer follows the example from Keras' documentation \url{https://machinelearningmastery.com/use-word-embedding-layers-deep-learning-keras/}.
 
+
 For both Vanilla RNN and LSTM, I systematically test different models by varying the
 state dimension, the batch size and the number of epochs. Then, I further refine
 the LSTM model by trying different learning rates and adding dropout.
@@ -190,16 +191,17 @@ This second RNN experiment was performed using tensorflow-gpu on a computer with
 graphics card, and yet the training time is still excruciatingly slow.
 
 At best, I obtained 70\% error on train and test. With settings (200, 128, 15)
-the model reaches 83\% on the train set, but fares worse on the test set indicating
- overfitting. I could have tweaked the learning rate, added dropout,
-or trained even longer but -- after testing the LSTM models, which easily reach 85\% --
-it did not seem terribly interesting to continue to play with RNN hyperparameters,
-especially the long training time.
+the model reaches 83\% on the train set, but fares worse on the test set
+and so is probably overfitting. Perhaps these medicocre results can be attributed
+to  the vanishing gradient problem, since the LSTM models have significantly better
+performance.
 
 \section{LSTM}
 
 As in the previous section, this first experiment ({\em experiment\_lstm.py}) trains
-LSTM models using different state dimensions, the batch sizes and number of epochs using combinations of:
+LSTM models (embedding layer, lstm layer, dense layer) using different
+LSTM state dimensions, batch sizes and number of epochs. I chose to take
+combinations from:
 
 \begin{minted}{python}
 NUM_EPOCHS = [1,2,3,4,5]
@@ -208,19 +210,16 @@ STATE_DIM = [20, 50, 100, 200]
 \end{minted}
 
 This experiment was much too slow for my laptop's Intel i5 CPU, so I used a machine
- equipped with a Geforce GTX 1060 to run this series of tests.
+equipped with a Geforce GTX 1060 to run this series of tests. This experiment used
+a basic LSTM layer because the optimized version was causing an error I couldn't
+solve at the time (more in later experiments).
 
 Because of the long running time, I decided to run each test
 for a smaller number of epochs. Also, this experiment crashed whenever
 the neuron parameter (the state dimension) for the LSTM layer was set to 500, so
 unfortunately that data is not available. I suspect that this crash was
 caused by exceeding the available memory on the graphics card.
-
-Although Keras has an optimized implementation
-called CuDNNLSTM for training these types of models on a GPU with CUDA,
-this experiment used the basic LSTM layer because the optimized version
-was causing an error I couldn\'t solve at the time (more on that later).
-The table below lists the best models:
+The table below lists the best models (see Appendix II for full table):
 
 \newpage
 
@@ -240,22 +239,16 @@ State Dim & Batch & Epochs & Params & Train Err & Train Acc & Test Err & Test Ac
 \label{tab:resultslstm}
 \end{longtable}
 
-The best performance (test error 86\%) was achieved with settings (200, 64, 5).
-The next table compares the performance of the models with state dimension
-and epochs fixed to contrast the effect of the batch size on performance.
+The best performance (test accuracy 86\%) in this run
+was achieved with settings (200, 64, 5).
+
+The next table shows the effect of the batch size on training time
+and accurac:
 
 \begin{longtable}{c | c | c | c | c | c | c | c | c}
 State Dim & Batch & Epochs & Params & Train Err & Train Acc & Test Err & Test Acc & Runtime\\
 \hline
 \endhead
-200 & 64 & 1 & 9112294 & 0.6191 & 0.6570 & 0.4727 & 0.7749 & 813.5 \\
-200 & 128 & 1 & 9112294 & 0.6517 & 0.6222 & 0.5976 & 0.6752 & 597.9 \\
-200 & 256 & 1 & 9112294 & 0.6681 & 0.5987 & 0.5610 & 0.7182 & 509.6 \\
-\hline
-200 & 64 & 2 & 9112294 & 0.4284 & 0.8040 & 0.3814 & 0.8322 & 1147.2 \\
-200 & 128 & 2 & 9112294 & 0.5343 & 0.7387 & 0.5074 & 0.7414 & 712.9 \\
-200 & 256 & 2 & 9112294 & 0.6114 & 0.6739 & 0.6162 & 0.6643 & 553.7 \\
-\hline
 200 & 64 & 3 & 9112294 & 0.3710 & 0.8348 & 0.3453 & 0.8462 & 1598.0 \\
 200 & 128 & 3 & 9112294 & 0.4757 & 0.7735 & 0.4411 & 0.7933 & 936.5 \\
 200 & 256 & 3 & 9112294 & 0.5647 & 0.7134 & 0.5496 & 0.7383 & 672.8 \\
@@ -271,9 +264,8 @@ State Dim & Batch & Epochs & Params & Train Err & Train Acc & Test Err & Test Ac
 \label{tab:batchsizelstm}
 \end{longtable}
 
-I suspect that, with smaller batches, we are unable to take full advantage of the
-GPU's parallel processing power. It might have been better to run the experiment
-with a much larger batch size.
+I suspect tha using smaller batches does not take full advantage of the
+GPU's parallel processing power.
 
 For the next experiment, I fixed the settings for the state dimension, batch size
 and number of epochs and tried a few different learning rates. I also
@@ -282,7 +274,6 @@ the mask\_zero feature of the embedding layer, which I had used for the other
 models. After removing this option, CuDNNLSTM works fine -- and very quickly!
 Even after increasing the number of epochs to 25, the models still train faster
 than with simple LSTM. The table below shows the result of three different learning rate:
-
 
 \begin{longtable}{c | c | c | c | c | c | c | c | c}
 Learning Rate & State Dim & Batch & Epochs & Train Err & Train Acc & Test Err & Test Acc & Runtime\\
