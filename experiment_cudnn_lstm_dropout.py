@@ -2,6 +2,8 @@ import preprocess_data
 import os
 from itertools import product
 import keras
+from keras.models import Model
+from keras.models import Sequential
 from keras.layers import Flatten
 from keras.layers import Dense
 from keras.layers import Input
@@ -11,8 +13,6 @@ from keras.layers import SimpleRNN
 #from keras.layers import LSTM
 from keras.layers import Dropout
 from keras.layers import CuDNNLSTM
-from keras.models import Model
-from keras.models import Sequential
 from keras.initializers import Constant
 import time
 
@@ -23,7 +23,7 @@ GLOVE_DIM = 100
 MAX_NB_WORDS = 1000
 MAX_SEQUENCE_LENGTH = 1000
 BATCH_SIZE = 256
-NUM_EPOCHS = 25
+NUM_EPOCHS = 30
 STATE_DIM = 200
 LEARNING_RATE = 0.01
 DROPOUT_RATE = [0.1, 0.2, 0.3]
@@ -63,7 +63,7 @@ for dropout_rate in DROPOUT_RATE:
     history = model.fit(x_train, y_train, epochs=num_epochs, batch_size=batch_size)
     result = model.evaluate(x_test, y_test)
     fit_time = time.time() - start_fit
-    result = ([glove_dim, state_dim, batch_size, model.count_params(),
+    result = ([dropout_rate, glove_dim, state_dim, batch_size, model.count_params(),
                     history.history['loss'][-1], history.history['acc'][-1],
                     result[0], result[1], fit_time])
     results_lstm.append(result)

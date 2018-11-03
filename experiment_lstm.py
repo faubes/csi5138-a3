@@ -1,5 +1,5 @@
 import preprocess_data
-import imdb_rnn
+import imdb_rnn_lstm
 import os
 from itertools import product
 
@@ -29,7 +29,7 @@ max_seq_length = MAX_SEQUENCE_LENGTH
 for num_epochs, batch_size, state_dim in product(NUM_EPOCHS, BATCH_SIZE, STATE_DIM):
     print("LSTM Test: Epochs {}, Batch_size {}, State_dim {}".format(num_epochs, batch_size, state_dim))
 
-    results_lstm.append(imdb_rnn.build_and_test_lstm(x_train, y_train, x_test, y_test, word_index,
+    results_lstm.append(imdb_rnn_lstm.build_and_test_lstm(x_train, y_train, x_test, y_test, word_index,
         max_seq_length, glove_dim, embed_matrix, state_dim, num_dense, num_epochs, batch_size))
 
     with open('lstm_test.log', 'a') as f:

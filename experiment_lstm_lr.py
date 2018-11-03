@@ -41,7 +41,7 @@ state_dim = STATE_DIM
 max_seq_length = MAX_SEQUENCE_LENGTH
 learn_rate = LEARNING_RATE
 
-for dropout_rate in DROPOUT_RATE:
+for learn_rate in LEARNING_RATE:
     print("LSTM Test: Epochs {}, Batch_size {}, State_dim {}, lr {}".format(num_epochs, batch_size, state_dim, learn_rate))
     optimizer = keras.optimizers.RMSprop(lr=learn_rate, rho=0.9, epsilon=None, decay=0.0)
     model = Sequential()

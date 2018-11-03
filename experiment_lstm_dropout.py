@@ -1,7 +1,7 @@
 # test dropout rates
 
 import preprocess_data
-import imdb_rnn
+import imdb_rnn_lstm
 import os
 from itertools import product
 
@@ -30,7 +30,7 @@ max_seq_length = MAX_SEQUENCE_LENGTH
 for dropout in DROPOUT:
     print("LSTM Dropout Test: ".format(dropout))
 
-    results_lstm.append(imdb_rnn.build_and_test_lstm_dropout(x_train, y_train, x_test, y_test, word_index,
+    results_lstm.append(imdb_rnn_lstm.build_and_test_lstm_dropout(x_train, y_train, x_test, y_test, word_index,
         max_seq_length, glove_dim, embed_matrix, state_dim, num_dense, num_epochs, batch_size, dropout))
 
     with open('lstm_dropout_test.log', 'a') as f:
