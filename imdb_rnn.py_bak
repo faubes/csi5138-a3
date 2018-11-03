@@ -1,0 +1,93 @@
+# Preprocess data into word embedding
+#
+# Uses code from
+# https://blog.keras.io/using-pre-trained-word-embeddings-in-a-keras-model.html
+
+# Joel Faubert
+# 2560106
+# CSI5138 HW3
+# Ottawa University
+# Fall 2018
+#
+
+
+
+import keras
+from keras.preprocessing.text import Tokenizer
+from keras.preprocessing.sequence import pad_sequences
+from keras.utils import to_categorical
+from keras.layers import Flatten, Dense, Input, GlobalMaxPooling1D
+from keras.layers import Embedding
+from keras.layers import SimpleRNN
+from keras.models import Model
+from keras.models import Sequential
+from keras.initializers import Constant
+import numpy as np
+import time # get an idea of time required to preprocess
+import os # for loading the GLOVE file
+import load_imdb_data #
+
+DATASET_PATH = "/home/joel/datasets/"
+GLOVE_PATH = "/home/joel/datasets/glove"
+GLOVE_DIM = 50
+#MAX_NB_WORDS = 400000
+MAX_NB_WORDS = 1000
+EMBEDDING_DIM = 100
+MAX_SEQUENCE_LENGTH = 1000
+NUM_EPOCHS = 3
+BATCH_SIZE = 128
+STATE_DIM = 50
+
+print('Loading dataset')
+x_train, y_train, x_test, y_test = load_imdb_data.load_imdb_dataset(DATASET_PATH)
+
+print('Tokenizing texts')
+tokenizer = Tokenizer(num_words=MAX_NB_WORDS,
+    filters='!"#$%&()*+,-./:;<=>?@[\]^_`{|}~ ',
+    lower=True, split=' ', char_level=False, oov_token=None, document_count=0)
+
+tokenizer.fit_on_texts(x_train)
+word_index = tokenizer.word_index
+train_sequences = tokenizer.texts_to_sequences(x_train)
+train_sequences = pad_sequences(train_sequences, maxlen=MAX_SEQUENCE_LENGTH)
+test_sequences = tokenizer.texts_to_sequences(x_test)
+test_sequences = pad_sequences(test_sequences, maxlen=MAX_SEQUENCE_LENGTH)
+
+y_train = to_categorical(y_train, 2)
+y_test = to_categorical(y_test, 2)
+
+print('Loading word vectors')
+# from https://blog.keras.io/using-pre-trained-word-embeddings-in-a-keras-model.html
+embeddings_index = {}
+f = open(os.path.join(GLOVE_PATH, 'glove.6B.100d.txt'))
+for line in f:
+    values = line.split()
+    word = values[0]
+    coefs = np.asarray(values[1:], dtype='float32')
+    embeddings_index[word] = coefs
+f.close()
+
+print('Found %s word vectors.' % len(embeddings_index))
+
+embedding_matrix = np.zeros((len(word_index) + 1, EMBEDDING_DIM))
+for word, i in word_index.items():
+    embedding_vector = embeddings_index.get(word)
+    if embedding_vector is not None:
+        # words not found in embedding index will be all-zeros.
+        embedding_matrix[i] = embedding_vector
+
+
+model = Sequential()
+model.add(Embedding(len(word_index) + 1, EMBEDDING_DIM,
+    embeddings_initializer=Constant(embedding_matrix),
+    input_length=MAX_SEQUENCE_LENGTH, mask_zero=True,
+    trainable=False))
+model.add(SimpleRNN(STATE_DIM, activation='tanh'))
+model.add(Dense(64, activation='relu'))
+model.add(Dense(2, activation='softmax'))
+model.compile(loss='categorical_crossentropy',
+              optimizer='rmsprop',
+              metrics=['acc'])
+
+history = model.fit(train_sequences, y_train, epochs=NUM_EPOCHS, batch_size=BATCH_SIZE)
+result = model.evaluate(test_sequences, y_test)
