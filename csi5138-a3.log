@@ -1,10 +1,10 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2018.10.12)  28 OCT 2018 22:13
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2018.10.12)  3 NOV 2018 15:12
 entering extended mode
  \write18 enabled.
  file:line:error style messages enabled.
  %&-line parsing enabled.
 **csi5138-a3.tex
-(/home/joel/school/csi5138/a3/csi5138-a3.tex
+(/home/joel/school/csi5138/csi5138-a3/csi5138-a3.tex
 LaTeX2e <2017-04-15>
 Babel <3.18> and hyphenation patterns for 84 language(s) loaded.
 (/usr/share/texlive/texmf-dist/tex/latex/base/article.cls
@@ -658,7 +658,7 @@ Package: catchfile 2016/05/16 v1.7 Catch the contents of a file (HO)
 )
 runsystem(uname -s > "csi5138-a3.w18")...executed.
 
- (/home/joel/school/csi5138/a3/csi5138-a3.w18)
+ (/home/joel/school/csi5138/csi5138-a3/csi5138-a3.w18)
 runsystem(rm -- "csi5138-a3.w18")...executed.
 
 ) (/usr/share/texlive/texmf-dist/tex/generic/xstring/xstring.sty (/usr/share/texlive/texmf-dist/tex/generic/xstring/xstring.tex
@@ -734,7 +734,7 @@ runsystem(which pygmentize && touch csi5138-a3.aex)...executed.
 
 runsystem(rm csi5138-a3.aex)...executed.
 
- (/home/joel/school/csi5138/a3/csi5138-a3.aux)
+ (/home/joel/school/csi5138/csi5138-a3/csi5138-a3.aux)
 \openout1 = `csi5138-a3.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 116.
@@ -800,7 +800,7 @@ Package: gettitlestring 2016/05/16 v1.5 Cleanup title references (HO)
 LaTeX Info: Redefining \ref on input line 116.
 LaTeX Info: Redefining \pageref on input line 116.
 LaTeX Info: Redefining \nameref on input line 116.
- (/home/joel/school/csi5138/a3/csi5138-a3.out) (/home/joel/school/csi5138/a3/csi5138-a3.out)
+ (/home/joel/school/csi5138/csi5138-a3/csi5138-a3.out) (/home/joel/school/csi5138/csi5138-a3/csi5138-a3.out)
 \@outlinefile=\write7
 \openout7 = `csi5138-a3.out'.
 
@@ -849,37 +849,53 @@ File: ursfs.fd 1998/03/24 rsfs font definition file (jk)
 )
 \openout3 = `csi5138-a3.pyg'.
 
- (/home/joel/school/csi5138/a3/_minted-csi5138-a3/default-pyg-prefix.pygstyle) (/home/joel/school/csi5138/a3/_minted-csi5138-a3/default.pygstyle) (/home/joel/school/csi5138/a3/_minted-csi5138-a3/DF8CBE874590489DA5A5E6C55390A718B2F07DE053CE45DFBA081C264062CE67.pygtex) [1{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}
+ (/home/joel/school/csi5138/csi5138-a3/_minted-csi5138-a3/default-pyg-prefix.pygstyle) (/home/joel/school/csi5138/csi5138-a3/_minted-csi5138-a3/default.pygstyle) (/home/joel/school/csi5138/csi5138-a3/_minted-csi5138-a3/DF8CBE874590489DA5A5E6C55390A718B2F07DE053CE45DFBA081C264062CE67.pygtex) [1{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}
 
 ]
 \openout3 = `csi5138-a3.pyg'.
 
- (/home/joel/school/csi5138/a3/_minted-csi5138-a3/E91F574BE31B077C9BA9A01AA2CB41AEB2F07DE053CE45DFBA081C264062CE67.pygtex) [2] [3] [4] (/home/joel/school/csi5138/a3/csi5138-a3.bbl) [5]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 365.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 365.
+ (/home/joel/school/csi5138/csi5138-a3/_minted-csi5138-a3/E91F574BE31B077C9BA9A01AA2CB41AEB2F07DE053CE45DFBA081C264062CE67.pygtex) [2]
+/home/joel/school/csi5138/csi5138-a3/csi5138-a3.tex:279: Missing $ inserted.
+<inserted text> 
+                $
+l.279 ...that CuDNNLSTM does not support the mask_
+                                                  zero
+I've inserted a begin-math/end-math symbol since I think
+you left one out. Proceed, with fingers crossed.
 
-(/home/joel/school/csi5138/a3/csi5138-a3.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 365.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 365.
+/home/joel/school/csi5138/csi5138-a3/csi5138-a3.tex:281: Missing $ inserted.
+<inserted text> 
+                $
+l.281 
+      
+I've inserted a begin-math/end-math symbol since I think
+you left one out. Proceed, with fingers crossed.
+
+[3] [4] [5] [6] (/home/joel/school/csi5138/csi5138-a3/csi5138-a3.bbl) [7]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 415.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 415.
+ (/home/joel/school/csi5138/csi5138-a3/csi5138-a3.aux)
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 415.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 415.
 Package rerunfilecheck Info: File `csi5138-a3.out' has not changed.
-(rerunfilecheck)             Checksum: 28393F29F54C3EE3252C1BB3B295B774;198.
+(rerunfilecheck)             Checksum: 20ECA66B964B5CE01F8511FF64B258AF;346.
 runsystem(rm csi5138-a3.pyg)...executed.
 
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 365.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 415.
  ) 
 Here is how much of TeX's memory you used:
- 22256 strings out of 492982
- 417750 string characters out of 6134895
- 576955 words of memory out of 5000000
- 25372 multiletter control sequences out of 15000+600000
+ 22268 strings out of 492982
+ 418068 string characters out of 6134895
+ 576296 words of memory out of 5000000
+ 25378 multiletter control sequences out of 15000+600000
  9965 words of font info for 41 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 55i,13n,67p,963b,453s stack positions out of 5000i,500n,10000p,200000b,80000s
-</usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb>
-Output written on /home/joel/school/csi5138/a3/csi5138-a3.pdf (5 pages, 90726 bytes).
+ 55i,12n,67p,963b,457s stack positions out of 5000i,500n,10000p,200000b,80000s
+</usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb>
+Output written on /home/joel/school/csi5138/csi5138-a3/csi5138-a3.pdf (7 pages, 113320 bytes).
 PDF statistics:
- 83 PDF objects out of 1000 (max. 8388607)
- 71 compressed objects within 1 object stream
- 17 named destinations out of 1000 (max. 500000)
- 45 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 112 PDF objects out of 1000 (max. 8388607)
+ 96 compressed objects within 1 object stream
+ 23 named destinations out of 1000 (max. 500000)
+ 61 words of extra memory for PDF output out of 10000 (max. 10000000)
 

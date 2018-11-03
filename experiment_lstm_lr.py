@@ -67,6 +67,6 @@ for dropout_rate in DROPOUT_RATE:
                     history.history['loss'][-1], history.history['acc'][-1],
                     result[0], result[1], fit_time])
     results_lstm.append(result)
-	
+
     with open('cudnn_lstm_dropout_test.log', 'a') as f:
         f.write("%s\n" % results_lstm[-1])

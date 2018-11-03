@@ -138,7 +138,8 @@ The code for loading the GloVE pretrained word embeddings and creating the embed
 The code for using an embedding layer follows the example from Keras' documentation \url{https://machinelearningmastery.com/use-word-embedding-layers-deep-learning-keras/}.
 
 For both Vanilla RNN and LSTM, I systematically test different models by varying the
-state dimension, the batch size and the number of epochs.
+state dimension, the batch size and the number of epochs. Then, I further refine
+the LSTM model by trying different learning rates and adding dropout.
 
 \section{Vanilla RNN}
 
@@ -151,9 +152,170 @@ BATCH_SIZE = [128, 256]
 STATE_DIM = [20, 50, 100, 200, 500]
 \end{minted}
 
-The train error, train accuracy, test error, test accuracy and running time (in secs)
-are shown in the table below. This experiment was performed on my Dell XPS 13 laptop
-and took approximately 18 hours to complete.
+See Appendix 1 for a table containing all results.
+The best performance appears to have been achieved with a state dimension of 100,
+batch size of 256 and 10 epochs.
+
+\begin{longtable}{c | c | c | c | c | c | c | c | c}
+State Dim & Batch & Epochs & Params & Train Error & Train Acc & Test Error & Test Acc & Runtime\\
+\hline
+\endhead
+20 & 128 & 6 & 4432708 & 0.6172 & 0.6644 & 0.6113 & 0.6813 & 428.7 \\
+50 & 128 & 6 & 4437298 & 0.5930 & 0.6791 & 0.5829 & 0.7024 & 621.3 \\
+100 & 128 & 6 & 4448948 & 0.5827 & 0.6849 & 0.5933 & 0.6706 & 1053.0 \\
+20 & 128 & 6 & 4432708 & 0.6078 & 0.6732 & 0.5907 & 0.6996 & 347.2 \\
+100 & 256 & 10 & 4448948 & 0.5593 & 0.7100 & 0.5678 & 0.7086 & 1489.2 \\
+\caption{RNN models with best test performance}
+\end{longtable}
+
+\newpage
+
+However, even in the best case we have only around 70\% accuracy on the train/test set.
+Suspecting that perhaps 10 epochs were insufficient, I ran a second experiment
+with 15 epochs but it did not make much difference:
+
+\begin{longtable}{c | c | c | c | c | c | c | c | c}
+State Dim & Batch & Epochs & Params & Train Error & Train Acc & Test Error & Test Acc & Runtime\\
+\hline
+\endhead
+20 & 128 & 15 & 8864258 & 0.5764 & 0.6956 & 0.5526 & 0.7269 & 1765.4 \\
+50 & 128 & 15 & 8870348 & 0.5509 & 0.7152 & 0.5772 & 0.6901 & 17726.1 \\
+100 & 128 & 15 & 8884498 & 0.4885 & 0.7600 & 0.5716 & 0.7140 & 1819.4 \\
+200 & 128 & 15 & 8927798 & 0.3586 & 0.8366 & 0.7509 & 0.6379 & 1822.1 \\
+500 & 128 & 15 & 9177698 & 0.6932 & 0.5030 & 0.6932 & 0.5000 & 1833.0 \\
+\caption{RNN models with 15 epochs}
+\end{longtable}
+
+This second RNN experiment was performed using tensorflow-gpu on a computer with a GTX 1070
+graphics card, and yet the training time is still excruciatingly slow.
+
+At best, I obtained 70\% error on train and test. With settings (200, 128, 15)
+the model reaches 83\% on the train set, but fares worse on the test set indicating
+ overfitting. I could have tweaked the learning rate, added dropout,
+or trained even longer but -- after testing the LSTM models, which easily reach 85\% --
+it did not seem terribly interesting to continue to play with RNN hyperparameters,
+especially the long training time.
+
+\section{LSTM}
+
+As in the previous section, this first experiment ({\em experiment\_lstm.py}) trains
+LSTM models using different state dimensions, the batch sizes and number of epochs using combinations of:
+
+\begin{minted}{python}
+NUM_EPOCHS = [1,2,3,4,5]
+BATCH_SIZE = [64, 128, 256]
+STATE_DIM = [20, 50, 100, 200]
+\end{minted}
+
+This experiment was much too slow for my laptop's Intel i5 CPU, so I used a machine
+ equipped with a Geforce GTX 1060 to run this series of tests.
+
+Because of the long running time, I decided to run each test
+for a smaller number of epochs. Also, this experiment crashed whenever
+the neuron parameter (the state dimension) for the LSTM layer was set to 500, so
+unfortunately that data is not available. I suspect that this crash was
+caused by exceeding the available memory on the graphics card.
+
+Although Keras has an optimized implementation
+called CuDNNLSTM for training these types of models on a GPU with CUDA,
+this experiment used the basic LSTM layer because the optimized version
+was causing an error I couldn\'t solve at the time (more on that later).
+The table below lists the best models:
+
+\newpage
+
+\begin{longtable}{c | c | c | c | c | c | c | c | c}
+State Dim & Batch & Epochs & Params & Train Err & Train Acc & Test Err & Test Acc & Runtime\\
+\hline
+\endhead
+20 & 64 & 4 & 8869654 & 0.3828 & 0.8309 & 0.3606 & 0.8403 & 1881.4 \\
+100 & 64 & 4 & 8945494 & 0.3585 & 0.8431 & 0.3458 & 0.8526 & 1931.5 \\
+100 & 64 & 5 & 8945494 & 0.3280 & 0.8570 & 0.3401 & 0.8511 & 2324.2 \\
+100 & 128 & 5 & 8945494 & 0.3563 & 0.8419 & 0.3701 & 0.8336 & 1277.7 \\
+200 & 64 & 3 & 9112294 & 0.3710 & 0.8348 & 0.3453 & 0.8462 & 1598.0 \\
+200 & 64 & 4 & 9112294 & 0.3424 & 0.8504 & 0.3430 & 0.8455 & 1984.0 \\
+200 & 64 & 5 & 9112294 & 0.3141 & 0.8632 & 0.3223 & 0.8604 & 2371.3 \\
+200 & 256 & 5 & 9112294 & 0.4072 & 0.8131 & 0.3728 & 0.8339 & 848.0 \\
+\caption{LSTM models with best test performance}
+\label{tab:resultslstm}
+\end{longtable}
+
+The best performance (test error 86\%) was achieved with settings (200, 64, 5).
+The next table compares the performance of the models with state dimension
+and epochs fixed to contrast the effect of the batch size on performance.
+
+\begin{longtable}{c | c | c | c | c | c | c | c | c}
+State Dim & Batch & Epochs & Params & Train Err & Train Acc & Test Err & Test Acc & Runtime\\
+\hline
+\endhead
+200 & 64 & 1 & 9112294 & 0.6191 & 0.6570 & 0.4727 & 0.7749 & 813.5 \\
+200 & 128 & 1 & 9112294 & 0.6517 & 0.6222 & 0.5976 & 0.6752 & 597.9 \\
+200 & 256 & 1 & 9112294 & 0.6681 & 0.5987 & 0.5610 & 0.7182 & 509.6 \\
+\hline
+200 & 64 & 2 & 9112294 & 0.4284 & 0.8040 & 0.3814 & 0.8322 & 1147.2 \\
+200 & 128 & 2 & 9112294 & 0.5343 & 0.7387 & 0.5074 & 0.7414 & 712.9 \\
+200 & 256 & 2 & 9112294 & 0.6114 & 0.6739 & 0.6162 & 0.6643 & 553.7 \\
+\hline
+200 & 64 & 3 & 9112294 & 0.3710 & 0.8348 & 0.3453 & 0.8462 & 1598.0 \\
+200 & 128 & 3 & 9112294 & 0.4757 & 0.7735 & 0.4411 & 0.7933 & 936.5 \\
+200 & 256 & 3 & 9112294 & 0.5647 & 0.7134 & 0.5496 & 0.7383 & 672.8 \\
+\hline
+200 & 64 & 4 & 9112294 & 0.3424 & 0.8504 & 0.3430 & 0.8455 & 1984.0 \\
+200 & 128 & 4 & 9112294 & 0.3804 & 0.8278 & 0.3738 & 0.8363 & 1111.9 \\
+200 & 256 & 4 & 9112294 & 0.4792 & 0.7759 & 0.4170 & 0.8102 & 755.4 \\
+\hline
+200 & 64 & 5 & 9112294 & 0.3141 & 0.8632 & 0.3223 & 0.8604 & 2371.3 \\
+200 & 128 & 5 & 9112294 & 0.3556 & 0.8444 & 0.4414 & 0.7852 & 1282.4 \\
+200 & 256 & 5 & 9112294 & 0.4072 & 0.8131 & 0.3728 & 0.8339 & 848.0 \\
+\caption{LSTM varying batch size}
+\label{tab:batchsizelstm}
+\end{longtable}
+
+I suspect that, with smaller batches, we are unable to take full advantage of the
+GPU's parallel processing power. It might have been better to run the experiment
+with a much larger batch size.
+
+For the next experiment, I fixed the settings for the state dimension, batch size
+and number of epochs and tried a few different learning rates. I also
+resolved the problem with CuDNNLSTM: it turns out that CuDNNLSTM does not support
+the mask\_zero feature of the embedding layer, which I had used for the other
+models. After removing this option, CuDNNLSTM works fine -- and very quickly!
+Even after increasing the number of epochs to 25, the models still train faster
+than with simple LSTM. The table below shows the result of three different learning rate:
+
+
+\begin{longtable}{c | c | c | c | c | c | c | c | c}
+Learning Rate & State Dim & Batch & Epochs & Train Err & Train Acc & Test Err & Test Acc & Runtime\\
+\hline
+\endhead
+0.01 & 200 & 256 & 25 & 0.0520 & 0.9823 & 0.8744 & 0.83904 & 438.85 \\
+0.001 & 200 & 256 & 25 & 0.0731 & 0.9727 & 0.6378 & 0.83764 & 431.33 \\
+0.0001 & 200 & 256 & 25 & 0.4401 & 0.7958 & 0.4857 & 0.76332 & 433.65 \\
+\caption{LSTM learning rate}
+\label{tab:learningratelstm}
+\end{longtable}
+
+Here, we finally see the model fit the training data with high accuracy.
+The test accuracy, however, is about the same as in the previous experiment. Perhaps
+early stopping has provided some benefit to the generalization power of the model.
+
+Lastly, in an attempt to achieve at least 90\% test accuracy, I trained
+models with all previous models fixed, but with a varying dropout rate.
+This required increasing the number of epochs proportionally to the dropout rate
+in order to reach a high training accuracy. The results of this last experiment
+are listed below:
+
+
+\section{Conclusion}
+
+In retrospect, it would have been much better to evaluate a model after each epoch,
+rather than running the each test again from scratch. It only occurred to me that this
+might be possible after the fact, and indeed it is possible to set a callback
+function to trigger after each training epoch.
+
+\newpage
+
+\section{Appendix 1 -- RNN Experiment Results}
 
 \begin{longtable}{c | c | c | c | c | c | c | c | c}
 State Dim & Batch & Epochs & Params & Train Error & Train Acc & Test Error & Test Acc & Runtime\\
@@ -192,54 +354,11 @@ State Dim & Batch & Epochs & Params & Train Error & Train Acc & Test Error & Tes
 200 & 256 & 10 & 4487248 & 0.5196 & 0.7346 & 0.6190 & 0.6676 & 2878.4 \\
 500 & 256 & 10 & 4722148 & 0.6852 & 0.5666 & 0.6735 & 0.5828 & 9603.2 \\
 \caption{Simple RNN varying state dimension, batch size and epochs}
-\label{tab:resultsrnn}
+\label{tab:fullresultsrnn1}
 \end{longtable}
 
-The best performance appears to have been achieved with a state dimension of 100,
-batch size of 256 and 10 epochs.
-
-\begin{longtable}{c | c | c | c | c | c | c | c | c}
-State Dim & Batch & Epochs & Params & Train Error & Train Acc & Test Error & Test Acc & Runtime\\
-\hline
-\endhead
-20 & 128 & 6 & 4432708 & 0.6172 & 0.6644 & 0.6113 & 0.6813 & 428.7 \\
-50 & 128 & 6 & 4437298 & 0.5930 & 0.6791 & 0.5829 & 0.7024 & 621.3 \\
-100 & 128 & 6 & 4448948 & 0.5827 & 0.6849 & 0.5933 & 0.6706 & 1053.0 \\
-20 & 128 & 6 & 4432708 & 0.6078 & 0.6732 & 0.5907 & 0.6996 & 347.2 \\
-100 & 256 & 10 & 4448948 & 0.5593 & 0.7100 & 0.5678 & 0.7086 & 1489.2 \\
-\caption{RNN models with best test performance}
-\end{longtable}
-
-However, even in the best case we have only around 70\% accuracy on the train/test set.
-After testing the LSTM models, some of which reach 80\%, it did not seem terribly interesting
-to continue to play with RNN hyperparameters.
-
-\section{LSTM}
-
-As in the previous section, this experiment ({\em experiment\_lstm.py}) varies
-the state dimension, the batch size and the number of epochs using combinations of
-
-\begin{minted}{python}
-NUM_EPOCHS = [1,2,3,4,5]
-BATCH_SIZE = [64, 128, 256]
-STATE_DIM = [20, 50, 100, 200]
-\end{minted}
-
-This experiment was much too slow on my poor Intel i5 CPU, so I used a friend's
-machine -- equipped with a Geforce GTX 1060 -- to run this series of tests.
-
-Because of the long running time, I decided to run each test
-for a smaller number of epochs. Also, the experiment crashed whenever
-the neuron parameter (the state dimension) for the LSTM layer was set to 500, so
-unfortunately that data is not available.
-
-I'd also like to mention that, although Keras has an optimized implementation
-called CuDNNLSTM for training these types of models on a GPU with CUDA,
-this layer did not work on my friend's machine, throwing a cryptic error I could not
-solve. I suspect it has to do with the patches available for CUDA 9.0, which may or may
-not have all been (correctly) installed.
-
-\captionsetup{skip=10pt}
+\newpage
+\section{Appendix II -- LSTM Experiment Results}
 
 \begin{longtable}{c | c | c | c | c | c | c | c | c}
 State Dim & Batch & Epochs & Params & Train Err & Train Acc & Test Err & Test Acc & Runtime\\
@@ -310,63 +429,8 @@ State Dim & Batch & Epochs & Params & Train Err & Train Acc & Test Err & Test Ac
 100 & 256 & 5 & 8945494 & 0.4146 & 0.8092 & 0.4735 & 0.7713 & 832.0 \\
 200 & 256 & 5 & 9112294 & 0.4072 & 0.8131 & 0.3728 & 0.8339 & 848.0 \\
 \caption{LSTM varying state dimension, batch size and epochs}
-\label{tab:resultslstm}
+\label{tab:fullresultslstm1}
 \end{longtable}
-
-It is interesting to note that the batch size has a major impact on the running time.
-I suspect that, with smaller batches, we are unable to take full advantage of the
-GPU's parallel processing power. It might have been better to run the experiment
-with a much larger batch size.
-
-The best performance (test error 86\%) was achieved with state dimension 200, batch size
-64 and 5 epochs. The next table compares the performance of the models with state dimension
-and epochs fixed to contrast the effect of the batch size on performance.
-
-\begin{longtable}{c | c | c | c | c | c | c | c | c}
-State Dim & Batch & Epochs & Params & Train Err & Train Acc & Test Err & Test Acc & Runtime\\
-\hline
-\endhead
-200 & 64 & 1 & 9112294 & 0.6191 & 0.6570 & 0.4727 & 0.7749 & 813.5 \\
-200 & 128 & 1 & 9112294 & 0.6517 & 0.6222 & 0.5976 & 0.6752 & 597.9 \\
-200 & 256 & 1 & 9112294 & 0.6681 & 0.5987 & 0.5610 & 0.7182 & 509.6 \\
-\hline
-200 & 64 & 2 & 9112294 & 0.4284 & 0.8040 & 0.3814 & 0.8322 & 1147.2 \\
-200 & 128 & 2 & 9112294 & 0.5343 & 0.7387 & 0.5074 & 0.7414 & 712.9 \\
-200 & 256 & 2 & 9112294 & 0.6114 & 0.6739 & 0.6162 & 0.6643 & 553.7 \\
-\hline
-200 & 64 & 3 & 9112294 & 0.3710 & 0.8348 & 0.3453 & 0.8462 & 1598.0 \\
-200 & 128 & 3 & 9112294 & 0.4757 & 0.7735 & 0.4411 & 0.7933 & 936.5 \\
-200 & 256 & 3 & 9112294 & 0.5647 & 0.7134 & 0.5496 & 0.7383 & 672.8 \\
-\hline
-200 & 64 & 4 & 9112294 & 0.3424 & 0.8504 & 0.3430 & 0.8455 & 1984.0 \\
-200 & 128 & 4 & 9112294 & 0.3804 & 0.8278 & 0.3738 & 0.8363 & 1111.9 \\
-200 & 256 & 4 & 9112294 & 0.4792 & 0.7759 & 0.4170 & 0.8102 & 755.4 \\
-\hline
-200 & 64 & 5 & 9112294 & 0.3141 & 0.8632 & 0.3223 & 0.8604 & 2371.3 \\
-200 & 128 & 5 & 9112294 & 0.3556 & 0.8444 & 0.4414 & 0.7852 & 1282.4 \\
-200 & 256 & 5 & 9112294 & 0.4072 & 0.8131 & 0.3728 & 0.8339 & 848.0 \\
-\caption{LSTM varying batch size}
-\label{tab:batchsizelstm}
-\end{longtable}
-
-For each number of epochs, the best performance was obtained with a smaller batch
- size. Yet, as seen for the tests with 5 epochs, we do not have enough information
- to conclude a linear relationship between the two, as the worst performance was
- with batch size 128. As mentioned before, this table makes it obvious that
- increasing the batch size improves the running time.
-
-
-
-
-
-
-\section{Conclusion}
-
-In retrospect, it would have been much better to evaluate a model after each epoch,
-rather than running the each test again from scratch. It only occurred to me that this
-might be possible after the fact, and indeed it is possible to set a callback
-function to trigger after each training epoch.
-
 
 \newpage
 \bibliographystyle{IEEEtran}
