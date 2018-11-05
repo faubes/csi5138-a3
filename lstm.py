@@ -26,7 +26,7 @@ from datetime import datetime
 
 DATASET_PATH = "D:/datasets/"
 GLOVE_PATH = "D:/datasets/glove"
-GLOVE_DIM = 200
+GLOVE_DIM = 100
 #MAX_NB_WORDS = 400000
 MAX_NB_WORDS = 1000
 MAX_SEQUENCE_LENGTH = 1000
