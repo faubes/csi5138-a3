@@ -1,3 +1,7 @@
+#just the model once data is loaded
+#for fiddling with one-off models
+
+
 import preprocess_data
 import os
 from itertools import product
@@ -22,19 +26,15 @@ from datetime import datetime
 
 DATASET_PATH = "D:/datasets/"
 GLOVE_PATH = "D:/datasets/glove"
-GLOVE_DIM = 100
+GLOVE_DIM = 200
 #MAX_NB_WORDS = 400000
 MAX_NB_WORDS = 1000
 MAX_SEQUENCE_LENGTH = 1000
 BATCH_SIZE = 256
-NUM_EPOCHS = 30
+NUM_EPOCHS = 22
 STATE_DIM = 200
 LEARNING_RATE = 0.01
 DROPOUT_RATE = 0.1
-#def preprocess_data(data_path, glove_path, glove_dim, max_num_words, max_seq_length, embed_dim):
-x_train, y_train, x_test, y_test, word_index, embed_matrix = preprocess_data.load_and_process_data(DATASET_PATH, GLOVE_PATH, GLOVE_DIM,
-    MAX_NB_WORDS, MAX_SEQUENCE_LENGTH)
-
 
 results_lstm = []
 num_dense = 64
@@ -61,9 +61,9 @@ model.add(Dense(num_dense, activation='relu'))
 model.add(Dropout(dropout_rate))
 model.add(Dense(2, activation='softmax'))
 
-#optimizer = keras.optimizers.RMSprop(lr=0.001, rho=0.9, epsilon=None, decay=0.0)
+optimizer = keras.optimizers.RMSprop(lr=0.001, rho=0.9, epsilon=None, decay=0.0)
 #optimizer = keras.optimizers.SGD(lr=0.01, momentum=0.0, decay=0.0, nesterov=False)
-optimizer = keras.optimizers.Adadelta(lr=1.0, rho=0.95, epsilon=None, decay=0.0)
+#optimizer = keras.optimizers.Adadelta(lr=1.0, rho=0.95, epsilon=None, decay=0.0)
 
 model.compile(loss='categorical_crossentropy',
 			  optimizer=optimizer,
@@ -80,4 +80,4 @@ results_lstm.append(result)
 
 with open('cudnn_lstm_best_fit.log', 'a') as f:
 	f.write("%s"%datetime.now())
-	f.write("%s\n" % results_lstm_model[-1])
+	f.write("%s\n" % results_lstm[-1])
