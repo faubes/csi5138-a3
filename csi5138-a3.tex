@@ -137,6 +137,8 @@ The code for loading the GloVE pretrained word embeddings and creating the embed
 
 The code for using an embedding layer follows the example from Keras' documentation \url{https://machinelearningmastery.com/use-word-embedding-layers-deep-learning-keras/}.
 
+The models are extremely simple, consisting of an embedding layer, followed by
+a recurrent layer and finally a dense layer.
 
 For both Vanilla RNN and LSTM, I systematically test different models by varying the
 state dimension, the batch size and the number of epochs. Then, I further refine
@@ -296,13 +298,85 @@ This required increasing the number of epochs proportionally to the dropout rate
 in order to reach a high training accuracy. The results of this last experiment
 are listed below:
 
+Here, we finally see the model fit the training data with high accuracy.
+The test accuracy, however, is about the same as in the previous experiment. Perhaps
+early stopping has provided some benefit to the generalization power of the model.
+
+Next, in an attempt to correct what seemed like overfitting, I trained
+models with previous hyperparameters fixed, but with a varying dropout rate.
+The results of this last experiment are listed below:
+
+\begin{longtable}{c | c | c | c | c | c | c | c | c}
+Dropout Rate & State Dim & Batch & Epochs & Train Err & Train Acc & Test Err & Test Acc & Runtime\\
+\hline
+\endhead
+0.1 & 200 & 256 & 9115694 & 0.05835 & 0.9799 & 0.6569 & 0.84508 & 529.00 \\
+0.2 & 200 & 256 & 9115694 & 0.06864 & 0.9766 & 0.7829 & 0.83916 & 524.99 \\
+0.3 & 200 & 256 & 9115694 & 0.08160 & 0.9718 & 0.7396 & 0.84604 & 524.07 \\
+\caption{LSTM dropout rate}
+\label{tab:dropoutratelstm}
+\end{longtable}
+
+Unfortunately, adding dropout did not make a significant improvement on the
+test accuracy. The models still hover around 84\% accuracy. Finally,
+I tried a few different optimizers, and increasing the word embedding dimension
+to 200, but neither made a significant difference.
+
+\begin{longtable}{c | c | c | c | c | c | c | c | c | c}
+Optimizer & Glove Dim & State Dim & Batch & Epochs & Train Err & Train Acc & Test Err & Test Acc & Runtime\\
+\hline
+\endhead
+\text{AdaDelta} & 100 & 200 & 256 & 30 & 0.2589 & 0.8908 & 0.3563 & 0.8476 & 507.73 \\
+\text{RMSProp} & 200 & 200 & 256 & 30 & 0.02588 & 0.9913 & 1.1705 & 0.7935 & 608.46 \\
+\text{RMSProp} & 200 & 200 & 256 & 22 & 0.05586 & 0.9795 & 0.8244 & 0.8125 & 452.37 \\
+\caption{LSTM with different optimizers, higher dimension GloVe (word vectors)}
+\label{tab:lasttry}
+\end{longtable}
 
 \section{Conclusion}
 
-In retrospect, it would have been much better to evaluate a model after each epoch,
+After trying dozens of different hyperparameter settings, I was able to achieve
+84\% accuracy on the test set with an LSTM model using the following parameters:
+
+\begin{itemize}
+  \item Word-vector embedding dimension 100
+  \item 200 hidden unit (hidden state dimension)
+  \item Batch size of 256
+  \item Dropout rate of 0.1
+\end{itemize}
+
+ which I think is pretty good considering the
+simple structure of the model.
+
+Setting up Tensorflow (and Keras) to run on a GPU is tiresome: to use the
+precompiled binaries you need install special graphics drivers,
+a specific version of CUDA (9.0) and CuDNN.
+
+I would have liked to use CUDA 10.0 with my new graphics card, but that required
+ compiling Tensorflow from source with Bazel, which crashed mid-compilation.
+I suspect this is because of a difference between C++ Redist 2015 and 2017,
+even though they are supposed to be equivalent (and installing the latter prevents
+you from installing the former).
+
+Even once Tensorflow is working and can access your GPU's resources, training
+models can be hit or miss. It is especially easy to run
+into Out of Memory errors when tweaking the hyperparameters, like the dimensions
+and batch sizes. Also perplexing is that my scripts will occasionally (1/10 times)
+throw an error after compiling the model.
+
+From a software engineering solution, my code is somewhat embarassing: they
+are just scripts with for loops, essentially. Had I time, I would have
+proceeded more methodically and encapsulated objects in classes.
+
+Also, in retrospect, it would have been much better to evaluate a model after each epoch,
 rather than running the each test again from scratch. It only occurred to me that this
 might be possible after the fact, and indeed it is possible to set a callback
 function to trigger after each training epoch.
+
+
+
+
+
 
 \newpage
 
